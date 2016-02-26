@@ -36,7 +36,11 @@ def getPage(url):
         opener.addheaders = [('User-agent', 'Googlebot/2.1')]
         return opener.open(url).read()
     except HTTPError as e:
+        m.write(url)
         raise e
+    except socket.timeout as t:
+        m.write(url)
+        print t
 
 def getContractorLinks(content):
     linksList = []
@@ -123,10 +127,11 @@ def linkLister():
     p.map(getLinksFromList, RNCLinks)
 #     p.join()  
     
-
+missing = "/home/sensefields/development/watchdogsWorkspace/RNCCrawler/out/missing.txt"
 inFolder = "/home/sensefields/development/watchdogsWorkspace/RNCCrawler/in/"
 currentLinksFile = "links.txt"
 backupLinks(inFolder, currentLinksFile)
+m = open(missing, "a+")
 f = open(inFolder + currentLinksFile, "w+")
 linkLister()
 f.close()
@@ -134,6 +139,7 @@ print "Done getting"
 b = open(inFolder + currentLinksFile, 'r')
 linkGetter()
 b.close()
+m.close()
 print "Done getting"
 Parser.main(1)
 print "Done parsing"
